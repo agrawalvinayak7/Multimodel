@@ -11,6 +11,7 @@ import subprocess
 import torchaudio
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
+
 class MELDDataset(Dataset):
     def __init__(self, csv_path, video_dir):
         self.data = pd.read_csv(csv_path)
@@ -18,7 +19,6 @@ class MELDDataset(Dataset):
         self.video_dir = video_dir
 
         self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-    # Anger, Disgust, Sadness, Joy, Neutral, Surprise and Fear
 
         self.emotion_map = {'anger': 0, 'disgust': 1, 'sadness': 2,
                             'joy': 3, 'neutral': 4, 'surprise': 5, 'fear': 6}
@@ -31,13 +31,14 @@ class MELDDataset(Dataset):
         try:
             subprocess.run([
                 'ffmpeg',
-                '-i', video_path,
-                '-vn',
-                '-acodec', 'pcm_s16le',
-                '-ar', '16000',
-                '-ac', '1',
+                '-i', video_path,      # input video
+                '-vn',                 # drop the video stream (audio only)
+                '-acodec', 'pcm_s16le',  # uncompressed 16-bit PCM
+                '-ar', '16000',        # sample rate = 16 kHz
+                '-ac', '1',            # mono
                 audio_path
             ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # waveform is a tensor of shape (channels, num_samples)
             waveform, sample_rate = torchaudio.load(audio_path)
 
             if sample_rate != 16000:
@@ -46,11 +47,12 @@ class MELDDataset(Dataset):
 
             mel_spectrogram = torchaudio.transforms.MelSpectrogram(
                 sample_rate=16000,
-                n_mels=64,
-                n_fft=1024,
-                hop_length=512
+                n_fft=400,        # ~25 ms window at 16 kHz
+                hop_length=160,   # ~10 ms stride
+                n_mels=80         # # of mel bands (typical 64–128)
             )
 
+            # shape ~ [1, n_mels, time_frames]
             mel_spec = mel_spectrogram(waveform)
 
             # normlaize
@@ -118,6 +120,9 @@ class MELDDataset(Dataset):
                 # doing thsi because the resnet model expects the input in this format
             return torch.FloatTensor(np.array(frames)).permute(0, 3, 1, 2)
 
+# len(x) returns the size/length of a container
+# tells the DataLoader how many samples exist,
+# so it knows the epoch size and when to stop.
     def __len__(self):
         return len(self.data)
 
