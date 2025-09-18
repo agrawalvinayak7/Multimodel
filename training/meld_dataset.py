@@ -139,7 +139,8 @@ class MELDDataset(Dataset):
 
             if video_path_exist == False:
                 raise FileNotFoundError(f"Video file not found: {path}")
-                # neural networks require fixed sizes and consistent inputs and dimensions, so we want the input to be 128, reagardless of what the utterance is, so if it is too short we will pas it
+                # neural networks require fixed sizes and consistent inputs and dimensions, 
+                # so we want the input to be 128, reagardless of what the utterance is, so if it is too short we will pas it
 
             text_input = self.tokenizer(
                 row['Utterance'], padding='max_length', max_length=128, truncation=True, return_tensors='pt')
