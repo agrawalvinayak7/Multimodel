@@ -162,51 +162,6 @@ class MultimodalSentimentModel(nn.Module):
         }
 
 
-def compute_class_weights(dataset):
-    emotion_counts = torch.zeros(7)
-    sentiment_counts = torch.zeros(3)
-    skipped = 0
-    total = len(dataset)
-
-    print("\Counting class distributions...")
-    for i in range(total):
-        sample = dataset[i]
-
-        if sample is None:
-            skipped += 1
-            continue
-
-        emotion_label = sample['emotion_label']
-        sentiment_label = sample['sentiment_label']
-
-        emotion_counts[emotion_label] += 1
-        sentiment_counts[sentiment_label] += 1
-
-    valid = total - skipped
-    print(f"Skipped samples: {skipped}/{total}")
-
-    print("\nClass distribution")
-    print("Emotions:")
-    emotion_map = {0: 'anger', 1: 'disgust', 2: 'fear', 3: 'joy', 4: 'neutral', 5: 'sadness', 6: 'surprise'}
-    for i, count in enumerate(emotion_counts):
-        print(f"{emotion_map[i]}: {count/valid:.2f}")
-
-    print("\nSentiments:")
-    sentiment_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
-    for i, count in enumerate(sentiment_counts):
-        print(f"{sentiment_map[i]}: {count/valid:.2f}")
-
-    # Calculate class weights
-    emotion_weights = 1.0 / emotion_counts
-    sentiment_weights = 1.0 / sentiment_counts
-
-    # Normalize weights
-    emotion_weights = emotion_weights / emotion_weights.sum()
-    sentiment_weights = sentiment_weights / sentiment_weights.sum()
-
-    return emotion_weights, sentiment_weights
-
-
 class MultimodalTrainer:
     def __init__(self, model, train_loader, val_loader):
         self.model = model
@@ -221,11 +176,15 @@ class MultimodalTrainer:
         print(f"Validation samples: {val_size:,}")
         print(f"Batches per epoch: {len(train_loader):,}")
 
-        timestamp = datetime.now().strftime('%b%d_%H-%M-%S')  # Dec17_14-22-35
+        timestamp = datetime.now().strftime('%b%d_%H-%M-%S')
+        # whenever we upload a training script to aws sagemaker it'll inject this env var into the script
+        # so when we run this on aws it'll store under sm_model_dir otherwise if we run locally it'll get stored in a folder called runs
+        # base directory where we want to store the log files
         base_dir = '/opt/ml/output/tensorboard' if 'SM_MODEL_DIR' in os.environ else 'runs'
+        # format of the name of the log directory
         log_dir = f"{base_dir}/run_{timestamp}"
         self.writer = SummaryWriter(log_dir=log_dir)
-        self.global_step = 0
+        self.global_step = 0  # its a way for us to know what epoch we are at
 
         # Very high: 1, high: 0.1-0.01, medium: 1e-1, low: 1e-4, very low: 1e-5
         self.optimizer = torch.optim.Adam([
@@ -246,19 +205,6 @@ class MultimodalTrainer:
 
         self.current_train_losses = None
 
-        # Calculate calss weights
-        print("\nCalculating class weights...")
-        emotion_weights, sentiment_weights = compute_class_weights(
-            train_loader.dataset)
-
-        device = next(model.parameters()).device
-
-        self.emotion_weights = emotion_weights.to(device)
-        self.sentiment_weights = sentiment_weights.to(device)
-
-        print(f"Emotion weights on device: {self.emotion_weights.device}")
-        print(f"Sentiments weights on device: {self.sentiment_weights.device}")
-
         self.emotion_criterion = nn.CrossEntropyLoss(
             label_smoothing=0.05,  # find by try and error
             weight=self.emotion_weights
@@ -270,19 +216,23 @@ class MultimodalTrainer:
         )
 
     def log_metrics(self, losses, metrics=None, phase="train"):
-        if phase == "train":
+        if phase == "train":  # for training phase
             self.current_train_losses = losses
         else:  # Validation phase
-            self.writer.add_scalar(
+
+            # total training loss
+            self.writer.add_scalar(  # it'll add a singular numerical value that changes overtime
                 'loss/total/train', self.current_train_losses['total'], self.global_step)
             self.writer.add_scalar(
                 'loss/total/val', losses['total'], self.global_step)
 
+            # emotion
             self.writer.add_scalar(
                 'loss/emotion/train', self.current_train_losses['emotion'], self.global_step)
             self.writer.add_scalar(
                 'loss/emotion/val', losses['emotion'], self.global_step)
 
+            # sentiment
             self.writer.add_scalar(
                 'loss/sentiment/train', self.current_train_losses['sentiment'], self.global_step)
             self.writer.add_scalar(
@@ -297,6 +247,7 @@ class MultimodalTrainer:
                 f'{phase}/sentiment_precision', metrics['sentiment_precision'], self.global_step)
             self.writer.add_scalar(
                 f'{phase}/sentiment_accuracy', metrics['sentiment_accuracy'], self.global_step)
+
     # whenever we run through a epoch we train the data on some batches then we find what the loss is for that training dataset
     # we also want to evaluate how the model does on the validation dataset
 
@@ -363,9 +314,8 @@ class MultimodalTrainer:
         all_sentiment_preds = []
         all_sentiment_labels = []
 
-
         # what this does is that it makes computation faster by disable cal the grads everytime we do an inference on it
-        with torch.inference_mode(): 
+        with torch.inference_mode():
             for batch in data_loader:
                 device = next(self.model.parameters()).device
                 text_inputs = {
@@ -386,7 +336,8 @@ class MultimodalTrainer:
                 total_loss = emotion_loss + sentiment_loss
 
                 all_emotion_preds.extend(
-                    outputs["emotions"].argmax(dim=1).cpu().numpy()) # we save the indexes of the emotions with the highest possibilities
+                    # we save the indexes of the emotions with the highest possibilities
+                    outputs["emotions"].argmax(dim=1).cpu().numpy())
                 all_emotion_labels.extend(emotion_labels.cpu().numpy())
                 all_sentiment_preds.extend(
                     outputs["sentiments"].argmax(dim=1).cpu().numpy())
