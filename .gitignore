@@ -3,3 +3,6 @@ MELD.Raw.tar.gz
 *.mp4
 dataset/
 __pycache__/
+deployment/model
+.DS_Store
+**/.DS_Store

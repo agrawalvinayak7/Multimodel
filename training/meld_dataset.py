@@ -47,9 +47,9 @@ class MELDDataset(Dataset):
 
             mel_spectrogram = torchaudio.transforms.MelSpectrogram(
                 sample_rate=16000,
-                n_fft=400,        # ~25 ms window at 16 kHz
-                hop_length=160,   # ~10 ms stride
-                n_mels=80         # # of mel bands (typical 64–128)
+                n_fft=1024,        # ~25 ms window at 16 kHz
+                hop_length=512,   # ~10 ms stride
+                n_mels=64         # # of mel bands (typical 64–128)
             )
 
             # shape ~ [1, n_mels, time_frames]

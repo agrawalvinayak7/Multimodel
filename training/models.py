@@ -158,9 +158,52 @@ class MultimodalSentimentModel(nn.Module):
 
         return {
             'emotions': emotion_output,
-            'sentiment': sentiment_output
+            'sentiments': sentiment_output
         }
 
+def compute_class_weights(dataset):
+    emotion_counts = torch.zeros(7)
+    sentiment_counts = torch.zeros(3)
+    skipped = 0
+    total = len(dataset)
+
+    print("\Counting class distributions...")
+    for i in range(total):
+        sample = dataset[i]
+
+        if sample is None:
+            skipped += 1
+            continue
+
+        emotion_label = sample['emotion_label']
+        sentiment_label = sample['sentiment_label']
+
+        emotion_counts[emotion_label] += 1
+        sentiment_counts[sentiment_label] += 1
+
+    valid = total - skipped
+    print(f"Skipped samples: {skipped}/{total}")
+
+    print("\nClass distribution")
+    print("Emotions:")
+    emotion_map = {0: 'anger', 1: 'disgust', 2: 'fear', 3: 'joy', 4: 'neutral', 5: 'sadness', 6: 'surprise'}
+    for i, count in enumerate(emotion_counts):
+        print(f"{emotion_map[i]}: {count/valid:.2f}")
+
+    print("\nSentiments:")
+    sentiment_map = {0: 'negative', 1: 'neutral', 2: 'positive'}
+    for i, count in enumerate(sentiment_counts):
+        print(f"{sentiment_map[i]}: {count/valid:.2f}")
+
+    # Calculate class weights
+    emotion_weights = 1.0 / emotion_counts
+    sentiment_weights = 1.0 / sentiment_counts
+
+    # Normalize weights
+    emotion_weights = emotion_weights / emotion_weights.sum()
+    sentiment_weights = sentiment_weights / sentiment_weights.sum()
+
+    return emotion_weights, sentiment_weights
 
 class MultimodalTrainer:
     def __init__(self, model, train_loader, val_loader):
@@ -204,6 +247,19 @@ class MultimodalTrainer:
         )
 
         self.current_train_losses = None
+
+        # Calculate calss weights
+        print("\nCalculating class weights...")
+        emotion_weights, sentiment_weights = compute_class_weights(
+            train_loader.dataset)
+
+        device = next(model.parameters()).device
+
+        self.emotion_weights = emotion_weights.to(device)
+        self.sentiment_weights = sentiment_weights.to(device)
+
+        print(f"Emotion weights on device: {self.emotion_weights.device}")
+        print(f"Sentiments weights on device: {self.sentiment_weights.device}")
 
         self.emotion_criterion = nn.CrossEntropyLoss(
             label_smoothing=0.05,  # find by try and error
@@ -398,7 +454,7 @@ if __name__ == "__main__":
         outputs = model(text_inputs, video_frames, audio_features)
 
         emotion_probs = torch.softmax(outputs['emotions'], dim=1)[0]
-        sentiment_probs = torch.softmax(outputs['sentiment'], dim=1)[0]
+        sentiment_probs = torch.softmax(outputs['sentiments'], dim=1)[0]
 
     emotion_map = {
         0: 'anger', 1: 'disgust', 2: 'fear', 3: 'joy', 4: 'neutral', 5: 'sadness', 6: 'surprise'
