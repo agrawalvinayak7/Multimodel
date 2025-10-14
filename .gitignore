@@ -6,3 +6,4 @@ __pycache__/
 deployment/model
 .DS_Store
 **/.DS_Store
+multimodel.code-workspace
