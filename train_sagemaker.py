@@ -17,15 +17,16 @@ S3_TEST = f"s3://{BUCKET}/dataset/test/"
 
 
 def start_training():
-    # Pin session to eu-north-1
-    sess = sagemaker.Session(boto_session=boto3.Session(region_name=REGION))
+# Pin session to eu-north-1
+        sess = sagemaker.Session(boto_session=boto3.Session(region_name=REGION))
 
-    tensorboard_config = TensorBoardOutputConfig(
-        s3_output_path=S3_TENSORBOARD,
-        container_local_output_path="/opt/ml/output/tensorboard"
-    )
+        tensorboard_config = TensorBoardOutputConfig(
 
-    estimator = PyTorch(
+                s3_output_path=S3_TENSORBOARD,
+                container_local_output_path="/opt/ml/output/tensorboard"
+        )
+
+        estimator = PyTorch(
         entry_point="train.py",
         source_dir="training",
         role=ROLE,
@@ -33,17 +34,14 @@ def start_training():
         py_version="py311",
         instance_count=1,
         instance_type="ml.g5.xlarge",
-        hyperparameters={
-            "batch-size": 32,
-            "epochs": 25
-        },
+        hyperparameters={"batch-size": 32,"epochs": 25},
         tensorboard_config=tensorboard_config,
         sagemaker_session=sess,
         output_path=S3_OUTPUT
-    )
+        )
 
-    # Start training
-    estimator.fit({
+# Start training
+        estimator.fit({
         "training": S3_TRAIN,
         "validation": S3_DEV,
         "test": S3_TEST
