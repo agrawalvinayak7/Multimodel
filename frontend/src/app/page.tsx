@@ -3,7 +3,6 @@
 import CodeExamples from "~/components/client/CodeExamples";
 import CopyButton from "~/components/client/copy-button";
 import { Inference } from "~/components/client/inference";
-
 import SignOutButton from "~/components/client/Signout";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";

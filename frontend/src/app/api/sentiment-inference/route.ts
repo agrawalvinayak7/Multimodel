@@ -4,6 +4,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
 import { env } from "~/env";
 import { checkAndUpdateQuota } from "~/lib/quota";
+
 import { db } from "~/server/db";
 
 export async function POST(req: Request) {
@@ -76,7 +77,7 @@ export async function POST(req: Request) {
             EndpointName: env.AWS_ENDPOINT_NAME,
             ContentType: "application/json",
             Body: JSON.stringify({
-            video_path: `s3://your-bucket-name/${key}`,
+            video_path: `s3://video-sentimental-analysis/${key}`,
             }),
         });
 
