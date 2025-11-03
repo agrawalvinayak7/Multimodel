@@ -41,6 +41,7 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
       const { url, fileId, key } = await res.json();
 
       // 2. Upload file to S3
+// BUG : earlier was passing the body as file.type and content type was hard coded
       const uploadRes = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": file.type },

@@ -54,7 +54,10 @@ export async function POST(req: Request) {
     });
 
     const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-
+// here we are trying to create a new video file
+// this is just a row in the video file table in prisma 
+// BUG : the userid was set to unique due to which a user can have only one video file row created per user
+// FIX : remove  @unique which will allow users to create multiple video files for the same user
     await db.videoFile.create({
         data: {
             key: key,
