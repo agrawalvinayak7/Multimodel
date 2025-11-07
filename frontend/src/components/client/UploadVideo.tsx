@@ -34,15 +34,16 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error?.error || "Failed to get upload URL");
+        const errorData = await res.json() as { error?: string };
+        throw new Error(errorData?.error ?? "Failed to get upload URL");
       }
 
-      const { url, fileId, key } = await res.json();
+      const responseData = await res.json() as { url: string; key: string };
+      const { url, key } = responseData;
 
       // 2. Upload file to S3
 // BUG : earlier was passing the body as file.type and content type was hard coded
-      const uploadRes = await fetch(url, {
+      const uploadRes = await fetch(url as string, {
         method: "PUT",
         headers: { "Content-Type": file.type },
         body: file,
@@ -65,11 +66,11 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
       });
 
       if (!analysisRes.ok) {
-        const error = await analysisRes.json();
-        throw new Error(error?.error || "Failed to analyze video");
+        const errorData = await analysisRes.json() as { error?: string };
+        throw new Error(errorData?.error ?? "Failed to analyze video");
       }
 
-      const analysis = await analysisRes.json();
+      const analysis = await analysisRes.json() as Analysis;
 
       console.log("Analysis: ", analysis);
       onAnalysis(analysis);
@@ -90,7 +91,7 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) handleUpload(file);
+            if (file) void handleUpload(file);
           }}
           id="video-upload"
         />
