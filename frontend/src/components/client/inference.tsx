@@ -49,12 +49,11 @@ export function Inference({ quota }: InferenceProps) {
 
     analysis.analysis.utterances.forEach((utterance) => {
         utterance.emotions.forEach((emotion) => {
-            if (!emotionScores[emotion.label]) emotionScores[emotion.label] = [];
+            emotionScores[emotion.label] ??= [];
             emotionScores[emotion.label]!.push(emotion.confidence);
     });
         utterance.sentiments.forEach((sentiment) => {
-            if (!sentimentScores[sentiment.label])
-                sentimentScores[sentiment.label] = [];
+            sentimentScores[sentiment.label] ??= [];
                 sentimentScores[sentiment.label]!.push(sentiment.confidence);
         });
     });
@@ -94,21 +93,21 @@ export function Inference({ quota }: InferenceProps) {
             <div className="flex flex-col items-center">
             <span className="text-sm">Primary emotion</span>
             <span className="text-[40px]">
-                {EMOTION_EMOJI[averages?.topEmotion?.label!]}
+                {averages.topEmotion?.label ? EMOTION_EMOJI[averages.topEmotion.label] : ""}
             </span>
             <span className="text-sm text-gray-500">
                 {averages.topEmotion?.confidence.toFixed(3)} (
-                {(averages.topEmotion?.confidence! * 100).toFixed(0)}%)
+                {averages.topEmotion ? (averages.topEmotion.confidence * 100).toFixed(0) : "0"}%)
             </span>
             </div>
             <div className="flex flex-col items-center">
             <span className="text-sm">Primary Sentiment</span>
             <span className="text-[40px]">
-                {SENTIMENT_EMOJI[averages?.topSentiment?.label!]}
+                {averages.topSentiment?.label ? SENTIMENT_EMOJI[averages.topSentiment.label] : ""}
             </span>
             <span className="text-sm text-gray-500">
                 {averages.topSentiment?.confidence.toFixed(3)} (
-                {(averages.topSentiment?.confidence! * 100).toFixed(0)}%)
+                {averages.topSentiment ? (averages.topSentiment.confidence * 100).toFixed(0) : "0"}%)
             </span>
             </div></div>
         ) : (
@@ -122,7 +121,7 @@ export function Inference({ quota }: InferenceProps) {
         <h2 className="mt-2 text-sm text-slate-800">Analysis of utterances</h2>
         {analysis ? (
         <div className="flex flex-col gap-2">
-            {analysis?.analysis.utterances.map((utterance, i) => {
+            {analysis?.analysis.utterances.map((utterance) => {
             return (
                 <div
                 //since each child in the list should have a unique propert, so it has to be a key that is specific to each element
@@ -145,7 +144,7 @@ export function Inference({ quota }: InferenceProps) {
                     
                     <div className="flex w-full max-w-48 flex-col gap-2">
                         <span className="text-sm font-medium">Emotions</span>
-                        {utterance.emotions.map((emo, i) => {
+                        {utterance.emotions.map((emo) => {
                         return (
                             <div key={emo.label} className="flex items-center gap-2">
                                 <span className="w-16 whitespace-nowrap text-xs text-gray-500">
@@ -172,7 +171,7 @@ export function Inference({ quota }: InferenceProps) {
                         <span className="text-sm font-medium">
                             Sentiments
                         </span>
-                        {utterance.sentiments.map((sentiment, i) => {
+                        {utterance.sentiments.map((sentiment) => {
                         return (
                             <div key={sentiment.label} className="flex items-center gap-2">
                                 <span className="w-16 whitespace-nowrap text-xs text-gray-500">
