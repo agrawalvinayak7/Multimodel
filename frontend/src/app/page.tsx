@@ -6,10 +6,13 @@ import { Inference } from "~/components/client/inference";
 import SignOutButton from "~/components/client/Signout";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import LoginPage from "~/app/login/page";
 
 export default async function HomePage() {
   const session = await auth();
-
+  if (!session?.user?.id) {
+    return <LoginPage />;
+  }
   const quota = await db.apiQuota.findUniqueOrThrow({
     where: {
       userId: session?.user.id,
