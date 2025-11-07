@@ -45,7 +45,7 @@ export default function SignupPage(){
             setError("Failed to sign in")
         }
     }
-        catch(error){
+        catch{
             setError("Something went wrong")
         }
         finally{

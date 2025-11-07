@@ -29,7 +29,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
         }
 
-        const { key } = await req.json();
+        const body = await req.json() as { key?: string };
+        const { key } = body;
 
         if (!key) {
             return NextResponse.json({ error: "Key is required" }, { status: 400 });
@@ -82,7 +83,15 @@ export async function POST(req: Request) {
         });
 
         const response = await sagemakerClient.send(command);
-        const analysis = JSON.parse(new TextDecoder().decode(response.Body));
+        const responseBody = response.Body;
+        if (!responseBody) {
+            return NextResponse.json(
+                { error: "No response from endpoint" },
+                { status: 500 },
+            );
+        }
+        const decodedBody = new TextDecoder().decode(responseBody);
+        const analysis = JSON.parse(decodedBody) as { utterances: unknown[] };
 
         await db.videoFile.update({
             where: { key },

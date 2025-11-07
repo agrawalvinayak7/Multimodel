@@ -26,9 +26,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
     }
 
-    const { fileType } = await req.json();
+    const body = await req.json() as { fileType?: string };
+    const { fileType } = body;
 
-    if (!fileType || !fileType.match(/\.(mp4|mov|avi)$/i)) {
+    if (!fileType?.match(/\.(mp4|mov|avi)$/i)) {
         return NextResponse.json(
             { error: "Invalid file type. Only .mp4, .mov, .avi are supported" },
             { status: 400 },
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
     const command = new PutObjectCommand({
         Bucket: env.AWS_INFERENCE_BUCKET,
         Key: key,
-        ContentType: `video/${fileType.replace(".", "")}`,
+        ContentType: `video/${fileType?.replace(".", "") ?? ""}`,
     });
 
     const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
         url,
         fileId: id,
-        fileType,
+        fileType: fileType ?? "",
         key,
     });
     } catch (error) {

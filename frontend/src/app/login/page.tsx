@@ -34,7 +34,7 @@ export default function LoginPage(){
             setError(signInResult.error === "CredentialsSignin" ? "Invalid email or password" : "Something went wrong")
         }
     }
-        catch(error){
+        catch{
             setError("Something went wrong")
         }
         finally{
