@@ -11,13 +11,7 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
-        DATABASE_URL: z
-        .string()
-        .min(1)
-        .refine(
-          (v) => v.startsWith("postgres://") || v.startsWith("postgresql://"),
-          { message: "DATABASE_URL must be a valid Postgres connection string" }
-        ),
+        DATABASE_URL: z.string().url(),
 
     NODE_ENV: z
       .enum(["development", "test", "production"])
