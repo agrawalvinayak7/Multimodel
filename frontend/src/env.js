@@ -14,11 +14,13 @@ export const env = createEnv({
         DATABASE_URL: z
         .string()
         .min(1)
-        .refine(
-          (value) =>
-            value.startsWith("postgres://") || value.startsWith("postgresql://"),
-          { message: "DATABASE_URL must be a valid Postgres connection string" }
-        ),
+        .refine((raw) => {
+          const value = raw.trim().replace(/^"+|"+$/g, "");
+          return (
+            value.toLowerCase().startsWith("postgres://") ||
+            value.toLowerCase().startsWith("postgresql://")
+          );
+        }, { message: "DATABASE_URL must be a valid Postgres connection string" }),
 
     NODE_ENV: z
       .enum(["development", "test", "production"])
