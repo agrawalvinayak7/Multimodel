@@ -11,16 +11,7 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
-        DATABASE_URL: z
-        .string()
-        .min(1)
-        .refine((raw) => {
-          const value = raw.trim().replace(/^"+|"+$/g, "");
-          return (
-            value.toLowerCase().startsWith("postgres://") ||
-            value.toLowerCase().startsWith("postgresql://")
-          );
-        }, { message: "DATABASE_URL must be a valid Postgres connection string" }),
+        DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
 
     NODE_ENV: z
       .enum(["development", "test", "production"])
