@@ -9,7 +9,14 @@ if (!authSecret) {
 }
 
 export async function middleware(req: NextRequest) {
-    const session = await getToken({ req, secret: authSecret });
+    const session = await getToken({
+        req,
+        secret: authSecret,
+        cookieName:
+            process.env.NODE_ENV === "production"
+                ? "__Secure-authjs.session-token"
+                : "authjs.session-token",
+    });
 
     if (!session) {
         const loginUrl = new URL("/login", req.nextUrl.origin);
@@ -23,4 +30,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
     matcher: ["/"],
 };
-// chagnes needed
