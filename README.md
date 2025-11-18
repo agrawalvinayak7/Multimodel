@@ -54,8 +54,6 @@ These three signals are sent to a **Fusion Layer**, which combines them into a s
 
 ### 1. Clone the Repository
 
-Bash
-
 ```bash
 git clone https://github.com/your-username/multimodel.git
 cd multimodel
@@ -187,7 +185,7 @@ Create a `.env` file in the `frontend` directory based on `.env.example` and pop
 
 ```bash
 # Database connection
-DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
+DATABASE_URL="your-database-url"
 
 # NextAuth Secret (Generate one using `npx auth secret`)
 AUTH_SECRET="your-super-secret-key"
