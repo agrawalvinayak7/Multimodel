@@ -1,101 +1,96 @@
-Multimodal Video Sentiment Analysis SaaS
-A full-stack AI application that analyzes video files to detect Emotions and Sentiments. By using a "Multimodal" approach, this application doesn't just look at one thing—it combines visual cues (face expressions), audio (tone of voice), and text (transcription) to understand the true feeling behind a video.
+# README
 
-🚀 Key Features
-Multimodal AI: Analyzes Video, Audio, and Text simultaneously for higher accuracy.
+# Multimodal Video Sentiment Analysis SaaS
 
-Granular Analysis: Breaks down videos into specific utterances (sentences) and analyzes each one.
+A full-stack AI application that analyzes video files to detect **Emotions** and **Sentiments**. By using a "Multimodal" approach, this application doesn't just look at one thing—it combines visual cues (face expressions), audio (tone of voice), and text (transcription) to understand the true feeling behind a video.
 
-7 Emotion Classes: Detects Anger, Disgust, Fear, Joy, Neutral, Sadness, and Surprise.
+## 🚀 Key Features
 
-Sentiment Detection: Classifies content as Positive, Neutral, or Negative.
+- **Multimodal AI:** Analyzes Video, Audio, and Text simultaneously for higher accuracy.
+- **Granular Analysis:** Breaks down videos into specific utterances (sentences) and analyzes each one.
+- **7 Emotion Classes:** Detects Anger, Disgust, Fear, Joy, Neutral, Sadness, and Surprise.
+- **Sentiment Detection:** Classifies content as Positive, Neutral, or Negative.
+- **Developer API:** Provides a secure API with quota management for developers to integrate analysis into their own apps.
+- **Modern Dashboard:** A clean Next.js user interface to upload videos and view detailed results.
 
-Developer API: Provides a secure API with quota management for developers to integrate analysis into their own apps.
+## 🛠️ Tech Stack
 
-Modern Dashboard: A clean Next.js user interface to upload videos and view detailed results.
+### Frontend (Web App)
 
-🛠️ Tech Stack
-Frontend (Web App)
-Framework: Next.js (App Router)
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)
+- **Styling:** Tailwind CSS
+- **Authentication:** NextAuth.js (Secure login/signup)
+- **Database:** PostgreSQL (via Prisma ORM)
+- **Language:** TypeScript
 
-Styling: Tailwind CSS
+### Backend (AI & Infrastructure)
 
-Authentication: NextAuth.js (Secure login/signup)
+- **Machine Learning:** PyTorch
+- **Speech-to-Text:** OpenAI Whisper
+- **Cloud Computing:** AWS SageMaker (for running the AI models)
+- **Storage:** AWS S3 (for storing uploaded videos)
+- **Video Processing:** FFmpeg & OpenCV
 
-Database: PostgreSQL (via Prisma ORM)
+## 🧠 How the AI Works (The "Multimodal" Part)
 
-Language: TypeScript
-
-Backend (AI & Infrastructure)
-Machine Learning: PyTorch
-
-Speech-to-Text: OpenAI Whisper
-
-Cloud Computing: AWS SageMaker (for running the AI models)
-
-Storage: AWS S3 (for storing uploaded videos)
-
-Video Processing: FFmpeg & OpenCV
-
-🧠 How the AI Works (The "Multimodal" Part)
 Most sentiment analysis tools only read text. This project is different because it uses three separate "Encoders":
 
-Text Encoder (BERT): Reads the words spoken in the video to understand the meaning.
+1. **Text Encoder (BERT):** Reads the words spoken in the video to understand the meaning.
+2. **Video Encoder (R3D_18):** Looks at the video frames to recognize facial expressions and body language.
+3. **Audio Encoder (CNN):** Listens to the sound waves (spectrograms) to detect tone and pitch.
 
-Video Encoder (R3D_18): Looks at the video frames to recognize facial expressions and body language.
+These three signals are sent to a **Fusion Layer**, which combines them into a single prediction. This mimics how humans naturally understand emotion.
 
-Audio Encoder (CNN): Listens to the sound waves (spectrograms) to detect tone and pitch.
+## ⚙️ Installation & Setup
 
-These three signals are sent to a Fusion Layer, which combines them into a single prediction. This mimics how humans naturally understand emotion.
+### Prerequisites
 
-⚙️ Installation & Setup
-Prerequisites
-Node.js (v18 or higher)
+- **Node.js** (v18 or higher)
+- **Python** (v3.11) - [Download Here](https://www.python.org/downloads/)
+- **PostgreSQL Database**
+- **AWS Account** with the following configured:
+    - **S3 Bucket** (for storing datasets and videos)
+    - **SageMaker Quota:** Request a quota increase for **Training Job usage** (Instance type: `ml.g5.xlarge` recommended).
 
-Python (v3.11) - Download Here
+### 1. Clone the Repository
 
-PostgreSQL Database
-
-AWS Account with the following configured:
-
-S3 Bucket (for storing datasets and videos)
-
-SageMaker Quota: Request a quota increase for Training Job usage (Instance type: ml.g5.xlarge recommended).
-
-1. Clone the Repository
 Bash
 
+```bash
 git clone https://github.com/your-username/multimodel.git
 cd multimodel
-2. Backend Setup & Data Preparation
+```
+
+### 2. Backend Setup & Data Preparation
+
 Navigate to the backend folder and install the required Python libraries.
 
-Bash
-
+```bash
 pip install -r backend/training/requirements.txt
-Download the Dataset:
+```
 
-Visit the MELD Dataset page.
+**Download the Dataset:**
 
-Download and extract the dataset.
+1. Visit the [MELD Dataset](https://affective-meld.github.io/) page.
+2. Download and extract the dataset.
+3. Place the extracted files into the `backend/dataset` directory.
 
-Place the extracted files into the backend/dataset directory.
+### 3. AWS Configuration (Crucial Step)
 
-3. AWS Configuration (Crucial Step)
 To train and deploy the model, you must set up specific permissions in AWS.
 
-A. S3 Bucket Setup
-Create an S3 bucket (e.g., video-sentimental-analysis) and upload your dataset folder there.
+### **A. S3 Bucket Setup**
 
-B. Create Training Role (IAM)
+Create an S3 bucket (e.g., `video-sentimental-analysis`) and upload your `dataset` folder there.
+
+### **B. Create Training Role (IAM)**
+
 Create a role in AWS IAM for SageMaker training with the following permissions:
 
-AmazonSageMakerFullAccess
+1. **AmazonSageMakerFullAccess**
+2. **S3 Access Policy:** Add this inline policy to allow access to your dataset bucket:
 
-S3 Access Policy: Add this inline policy to allow access to your dataset bucket:
-
-JSON
-
+```json
 {
 	"Version": "2012-10-17",
 	"Statement": [
@@ -115,32 +110,45 @@ JSON
 		}
 	]
 }
-C. Start Training Job
-Update the backend/train_sagemaker.py file with your S3 bucket name and the Role ARN you just created. Then run:
+```
 
-Bash
+### **C. Start Training Job**
 
+Update the `backend/train_sagemaker.py` file with your S3 bucket name and the Role ARN you just created. Then run:
+
+```bash
 python backend/train_sagemaker.py
-D. Create Deployment Role
+```
+
+### **D. Create Deployment Role**
+
 Create a new role for deploying the endpoint with these permissions:
 
-AmazonSageMakerFullAccess
+1. **AmazonSageMakerFullAccess**
+2. **CloudWatchLogsFullAccess**
+3. **S3 Access Policy** (Use the same JSON policy as above).
 
-CloudWatchLogsFullAccess
+### **E. Deploy Endpoint**
 
-S3 Access Policy (Use the same JSON policy as above).
+After training, put your model file (`model.tar.gz`) in your S3 bucket. Update `backend/deployment/deploy_endpoint.py` with your model path and Deployment Role ARN. Run:
 
-E. Deploy Endpoint
-After training, put your model file (model.tar.gz) in your S3 bucket. Update backend/deployment/deploy_endpoint.py with your model path and Deployment Role ARN. Run:
-
-Bash
-
+```bash
 python backend/deployment/deploy_endpoint.py
-F. Create Invocation User
-For the Frontend to talk to the Backend, create a user in IAM with specific permissions to invoke the endpoint. These are the keys you will use in your .env file.
+```
 
-JSON
+### **E. Deploy Endpoint**
 
+After training, put your model file (`model.tar.gz`) in your S3 bucket. Update `backend/deployment/deploy_endpoint.py` with your model path and Deployment Role ARN. Run:
+
+```bash
+python backend/deployment/deploy_endpoint.py
+```
+
+### **F. Create Invocation User**
+
+For the Frontend to talk to the Backend, create a user in IAM with specific permissions to invoke the endpoint. **These are the keys you will use in your `.env` file.**
+
+```json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -164,17 +172,20 @@ JSON
         }
     ]
 }
-4. Frontend Setup
+```
+
+### 4. Frontend Setup
+
 Navigate to the frontend folder and install dependencies:
 
-Bash
-
+```bash
 cd frontend
 npm install
-Create a .env file in the frontend directory based on .env.example and populate it with the keys from the Invocation User created above:
+```
 
-Code snippet
+Create a `.env` file in the `frontend` directory based on `.env.example` and populate it with the keys from the **Invocation User** created above:
 
+```bash
 # Database connection
 DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
 
@@ -187,40 +198,31 @@ AWS_ACCESS_KEY_ID="your-access-key-from-step-3F"
 AWS_SECRET_ACCESS_KEY="your-secret-key-from-step-3F"
 AWS_INFERENCE_BUCKET="your-s3-bucket-name"
 AWS_ENDPOINT_NAME="sentiment-analysis-endpoint"
+```
+
 Initialize the database:
 
-Bash
-
+```bash
 npx prisma db push
+```
+
 Run the development server:
 
-Bash
-
+```bash
 npm run dev
-Open http://localhost:3000 in your browser.
+```
 
-5. Monitoring (TensorBoard)
-To visualize the training progress (loss, accuracy), you can sync the logs from S3 and run TensorBoard locally.
+Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) in your browser.
 
-Download logs:
+## 🔌 API Usage
 
-Bash
+Developers can use the API to analyze videos programmatically. You can find your **Secret Key** in the dashboard after logging in.
 
-aws s3 sync s3://your-bucket-name/tensorboard ./tensorboard_logs
-Start Server:
+**Example Request (cURL):**
 
 Bash
 
-tensorboard --logdir tensorboard_logs
-View: Visit http://localhost:6006 in your browser.
-
-🔌 API Usage
-Developers can use the API to analyze videos programmatically. You can find your Secret Key in the dashboard after logging in.
-
-Example Request (cURL):
-
-Bash
-
+```bash
 # 1. Get Upload URL
 curl -X POST \
   -H "Authorization: Bearer YOUR_API_KEY" \
@@ -236,19 +238,15 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"key": "file_key_from_step_1"}' \
   http://localhost:3000/api/sentiment-inference
-📂 Project Structure
-frontend/: Contains the Next.js website, UI components, and API routes.
+```
 
-src/app/: Pages and routing.
+## 📂 Project Structure
 
-src/components/: Reusable UI elements (Upload button, Charts).
-
-prisma/: Database schema.
-
-backend/: Contains the Python code for the AI.
-
-training/: Scripts to train the neural network (train.py, models.py).
-
-deployment/: Scripts to deploy the model to AWS SageMaker (deploy_endpoint.py).
-
-dataset/: Logic for handling the MELD dataset.
+- `frontend/`: Contains the Next.js website, UI components, and API routes.
+    - `src/app/`: Pages and routing.
+    - `src/components/`: Reusable UI elements (Upload button, Charts).
+    - `prisma/`: Database schema.
+- `backend/`: Contains the Python code for the AI.
+    - `training/`: Scripts to train the neural network (`train.py`, `models.py`).
+    - `deployment/`: Scripts to deploy the model to AWS SageMaker (`deploy_endpoint.py`).
+    - `dataset/`: Logic for handling the MELD dataset.
