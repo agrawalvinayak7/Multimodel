@@ -134,17 +134,9 @@ After training, put your model file (`model.tar.gz`) in your S3 bucket. Update `
 python backend/deployment/deploy_endpoint.py
 ```
 
-### **E. Deploy Endpoint**
-
-After training, put your model file (`model.tar.gz`) in your S3 bucket. Update `backend/deployment/deploy_endpoint.py` with your model path and Deployment Role ARN. Run:
-
-```bash
-python backend/deployment/deploy_endpoint.py
-```
-
 ### **F. Create Invocation User**
 
-For the Frontend to talk to the Backend, create a user in IAM with specific permissions to invoke the endpoint. **These are the keys you will use in your `.env` file.**
+For the Frontend to talk to the Backend, create a user in IAM with specific permissions to invoke the endpoint.
 
 ```json
 {
@@ -201,7 +193,8 @@ AWS_ENDPOINT_NAME="sentiment-analysis-endpoint"
 Initialize the database:
 
 ```bash
-npx prisma db push
+npm run db:generate
+npm run db:push
 ```
 
 Run the development server:
