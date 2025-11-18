@@ -187,7 +187,7 @@ AWS_REGION="your-region"
 AWS_ACCESS_KEY_ID="your-access-key-from-step-3F"
 AWS_SECRET_ACCESS_KEY="your-secret-key-from-step-3F"
 AWS_INFERENCE_BUCKET="your-s3-bucket-name"
-AWS_ENDPOINT_NAME="sentiment-analysis-endpoint"
+AWS_ENDPOINT_NAME="your-endpoint-name"
 ```
 
 Initialize the database:
