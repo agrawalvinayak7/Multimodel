@@ -55,7 +55,7 @@ These three signals are sent to a **Fusion Layer**, which combines them into a s
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/multimodel.git
+git clone https://github.com/agrawalvinayak7/multimodel.git
 cd multimodel
 ```
 
