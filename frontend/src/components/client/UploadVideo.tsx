@@ -108,7 +108,7 @@ function UploadVideo({ apiKey, onAnalysis }: UploadVideoProps) {
                 : "Upload a video"}
           </h3>
           <p className="text-center text-xs text-gray-500">
-            Get started with sentiment detection by uploading a video.
+            Get started with sentiment detection by uploading a video under one minute long.
           </p>
         </label>
       </div>
