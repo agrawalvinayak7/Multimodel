@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FiCode, FiTerminal } from "react-icons/fi";
 
 function CodeExamples() {
     const [activeTab, setActiveTab] = useState<"ts" | "curl">("ts");
@@ -78,29 +79,42 @@ function CodeExamples() {
     /api/sentiment-inference`;
 
     return (
-        <div className="bg-opacity-70 mt-3 flex h-fit w-full flex-col rounded-xl bg-gray-100 p-4">
-        <span className="text-sm">API Usage</span>
-        <span className="mb-4 text-sm text-gray-500">
-            Examples of how to use the API with TypeScript and cURL.
-        </span>
-
-            <div className="overflow-hidden rounded-md bg-gray-900">
-                <div className="flex border-b border-gray-700">
-                    <button onClick={() => setActiveTab("ts")}
-                    className={`px-4 py-2 text-xs ${activeTab === "ts" ? "bg-gray-800 text-white" : "text-gray-400 hover:text-gray-300"}`}
+        <div className="rounded-lg bg-white border border-[#cccccc] p-6">
+            <div className="mb-4 flex items-center justify-between">
+                <div>
+                    <h2 className="text-base font-semibold text-[#1d1d1d]">API Usage</h2>
+                </div>
+                <div className="flex gap-1 rounded bg-[#f5f5f5] p-1">
+                    <button
+                        onClick={() => setActiveTab("ts")}
+                        className={`flex items-center gap-2 rounded px-3 py-1.5 text-xs font-semibold transition-colors ${activeTab === "ts"
+                            ? "bg-[#5b7fc4] text-white"
+                            : "text-[#666666] hover:text-[#1d1d1d]"
+                            }`}
                     >
+                        <FiCode />
                         TypeScript
                     </button>
-                    <button onClick={() => setActiveTab("curl")}
-                    className={`px-4 py-2 text-xs ${activeTab === "curl" ? "bg-gray-800 text-white" : "text-gray-400 hover:text-gray-300"}`}
+                    <button
+                        onClick={() => setActiveTab("curl")}
+                        className={`flex items-center gap-2 rounded px-3 py-1.5 text-xs font-semibold transition-colors ${activeTab === "curl"
+                            ? "bg-[#5b7fc4] text-white"
+                            : "text-[#666666] hover:text-[#1d1d1d]"
+                            }`}
                     >
+                        <FiTerminal />
                         cURL
                     </button>
                 </div>
+            </div>
+
+            <div className="overflow-hidden rounded border border-[#cccccc] bg-[#1d1d1d]">
                 <div className="p-4">
-                <pre className="max-h-[300px] overflow-y-auto text-xs text-gray-300">
-                    <code>{activeTab === "ts" ? tsCode : curlCode}</code>
-                </pre>
+                    <pre className="max-h-[300px] overflow-y-auto font-mono text-xs leading-relaxed text-[#e0e0e0]">
+                        <code>
+                            {activeTab === "ts" ? tsCode : curlCode}
+                        </code>
+                    </pre>
                 </div>
             </div>
         </div>

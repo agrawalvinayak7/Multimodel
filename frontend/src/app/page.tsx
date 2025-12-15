@@ -7,6 +7,7 @@ import SignOutButton from "~/components/client/Signout";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import LoginPage from "~/app/login/page";
+import { Logo } from "~/components/ui/logo";
 
 export default async function HomePage() {
   const session = await auth();
@@ -20,57 +21,69 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
-      <nav className="flex h-16 items-center justify-between border-b border-gray-200 px-10">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-800 text-white">
-            SA
+    <div className="min-h-screen w-full bg-[#004d9c]">
+      <nav className="sticky top-0 z-50 bg-[#003d7a] border-b border-[#0055b3]">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-3">
+            <Logo className="h-8 w-8" />
+            <span className="text-xl font-semibold text-white">Sentiment Analysis</span>
           </div>
-          <span className="text-lg font-medium">Sentiment Analysis</span>
-        </div>
 
-        <SignOutButton />
+          <SignOutButton />
+        </div>
       </nav>
 
-      <main className="flex min-h-screen w-full flex-col gap-6 p-4 sm:p-10 md:flex-row">
-        <Inference quota={{ secretKey: quota.secretKey }} />
-        <div className="hidden border-l border-slate-200 md:block"></div>
-        <div className="flex h-fit w-full flex-col gap-3 md:w-1/2">
-          <h2 className="text-lg font-medium text-slate-800">API</h2>
-          <div className="mt-3 flex h-fit w-full flex-col rounded-xl bg-gray-100 bg-opacity-70 p-4">
-            <span className="text-sm">Secret key</span>
-            <span className="text-sm text-gray-500">
-              This key should be used when calling our API, to authorize your
-              request. It can not be shared publicly, and needs to be kept
-              secret.
-            </span>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-sm">Key</span>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="w-full max-w-[200px] overflow-x-auto rounded-md border border-gray-200 px-3 py-1 text-sm text-gray-600 sm:w-auto">
-                  {quota.secretKey}
-                </span>
-                <CopyButton text={quota.secretKey} />
-              </div>
+      <main className="mx-auto flex max-w-7xl flex-col gap-6 p-6 md:flex-row md:p-8">
+        {/* Left Column: Inference */}
+        <div className="flex w-full flex-col gap-6 md:w-7/12 lg:w-3/5">
+          <div className="rounded-lg bg-white border border-[#cccccc] p-6">
+            <Inference quota={{ secretKey: quota.secretKey }} />
+          </div>
+        </div>
+
+        {/* Right Column: API & Info */}
+        <div className="flex w-full flex-col gap-6 md:w-5/12 lg:w-2/5">
+
+          {/* API Key Card */}
+          <div className="rounded-lg bg-white border border-[#cccccc] p-6">
+            <div className="border-b border-[#e0e0e0] pb-4 mb-4">
+              <h2 className="text-base font-semibold text-[#1d1d1d]">Secret key</h2>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-sm text-[#666666] leading-relaxed">
+                Use this key to authenticate your requests. Keep it safe!
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between rounded bg-[#f5f5f5] border border-[#cccccc] p-3">
+              <span className="font-mono text-sm text-[#1d1d1d] truncate max-w-[200px]">
+                {quota.secretKey}
+              </span>
+              <CopyButton text={quota.secretKey} />
             </div>
           </div>
 
-          <div className="mt-3 flex h-fit w-full flex-col rounded-xl bg-gray-100 bg-opacity-70 p-4">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <span className="text-sm">Monthly quota</span>
-              <span className="text-sm text-gray-500">
-                {quota.requestsUsed} / {quota.maxRequests} requests
+          {/* Quota Card */}
+          <div className="rounded-lg bg-white border border-[#cccccc] p-6">
+            <div className="flex items-center justify-between border-b border-[#e0e0e0] pb-4 mb-4">
+              <h2 className="text-base font-semibold text-[#1d1d1d]">Monthly quota</h2>
+              <span className="text-sm font-medium text-[#666666]">
+                {quota.requestsUsed} / {quota.maxRequests}
               </span>
             </div>
-            <div className="mt-1 h-1 w-full rounded-full bg-gray-200">
+
+            <div className="h-2 w-full overflow-hidden rounded-full bg-[#e0e0e0]">
               <div
                 style={{
                   width: (quota.requestsUsed / quota.maxRequests) * 100 + "%",
                 }}
-                className="h-1 rounded-full bg-gray-800"
+                className="h-full rounded-full bg-[#5b7fc4] transition-all duration-500"
               ></div>
             </div>
           </div>
+
+          {/* Code Examples */}
           <CodeExamples />
         </div>
       </main>

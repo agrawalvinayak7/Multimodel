@@ -9,12 +9,11 @@ import { registerUser } from "~/app/actions/auth";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-export default function SignupPage(){
+export default function SignupPage() {
     const router = useRouter();
-    const [error, setError] = useState<string>("")
+    const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const form = useForm<SignupSchema>({
-        // here we do client side validation by using zodResolver
         resolver: zodResolver(signupSchema),
         defaultValues: {
             name: "",
@@ -23,157 +22,153 @@ export default function SignupPage(){
             confirmPassword: "",
         },
     });
-    async function onSubmit(data: SignupSchema){
-        try{
-            setLoading(true)
-            const result = await registerUser(data)
 
-            if(result.error){
-                setError(result.error)
-                return
-        }
+    async function onSubmit(data: SignupSchema) {
+        try {
+            setLoading(true);
+            const result = await registerUser(data);
 
-        // sign in after registration
-        const signInResult = await signIn("credentials", {
-            email: data.email,
-            password: data.password,
-            redirect: false,
-        })
-        if(!signInResult?.error){
-            router.push("/")
-        }else{
-            setError("Failed to sign in")
+            if (result.error) {
+                setError(result.error);
+                return;
+            }
+
+            // sign in after registration
+            const signInResult = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+            });
+            if (!signInResult?.error) {
+                router.push("/");
+            } else {
+                setError("Failed to sign in");
+            }
+        } catch {
+            setError("Something went wrong");
+        } finally {
+            setLoading(false);
         }
     }
-        catch{
-            setError("Something went wrong")
-        }
-        finally{
-            setLoading(false)
-        }
-    }
+
     return (
-        <div className="min-h-screen bg-white">
-            <nav className="flex h-16 items-center justify-between border-b border-gray-200 px-10">
-                <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-800 text-white">
-                        SA
-                    </div>
-                    <span className="text-lg font-medium">Sentiment Analysis</span>
-                </div>
-            </nav>
-
-
-            <main className="flex h-[calc(100vh-4rem)] items-center justify-center">
-                <div className= " w-full max-w-md space-y-8 px-4">
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold">
-                            Create an account
+        <div
+            className="min-h-screen bg-cover bg-center bg-fixed flex items-center justify-end px-8"
+            style={{ backgroundImage: "url('/background.jpg')" }}
+        >
+            {/* Right Side Card */}
+            <div className="animate-fade-in w-full max-w-md mr-8 lg:mr-16">
+                <div
+                    className="rounded-lg p-10 border border-[#999999]"
+                    style={{ backgroundColor: '#d4d5cf' }}
+                >
+                    {/* Header */}
+                    <div className="mb-8">
+                        <h2 className="text-[1.75rem] font-bold text-[#1d1d1d] mb-2">
+                            Create Account
                         </h2>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Sign up to get started with sentiment analysis.
+                        <p className="text-sm text-[#666666]">
+                            Sign up to get started with sentiment analysis
                         </p>
                     </div>
-                    <form className="mt-8 space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+
+                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         {error && (
-                            <div className="rounded-md bg-red-50 text-red-500 text-sm p-4">
-                            {error}
+                            <div className="rounded border border-[#d32f2f] bg-[#ffebee] p-3 text-center text-sm text-[#d32f2f]">
+                                {error}
                             </div>
                         )}
+
                         <div className="space-y-4">
                             <div>
-                                <label className="space-y-4 text-sm text-gray-700 font-medium">
+                                <label className="block text-xs font-semibold text-[#1d1d1d] mb-1">
                                     Full Name
                                 </label>
-                                <input 
-                                {...form.register("name")}
-                                type="text"
-                                placeholder="Vinayak Agrawal"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeoholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none"
+                                <input
+                                    {...form.register("name")}
+                                    type="text"
+                                    placeholder="Vinayak Agrawal"
+                                    className="w-full rounded bg-white border border-[#999999] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#999999] outline-none transition-all duration-200 focus:border-[#5b7fc4] focus:border-2"
                                 />
-                                {
-                                    form.formState.errors.name && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                            {form.formState.errors.name.message}
-                                        </p>
-                                    )
-                                }
+                                {form.formState.errors.name && (
+                                    <p className="mt-1 text-xs text-[#d32f2f]">
+                                        {form.formState.errors.name.message}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
-                                <label className="space-y-4 text-sm text-gray-700 font-medium">
+                                <label className="block text-xs font-semibold text-[#1d1d1d] mb-1">
                                     Email address
                                 </label>
-                                <input 
-                                {...form.register("email")}
-                                type="email"
-                                placeholder="example@gmail.com"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none"
+                                <input
+                                    {...form.register("email")}
+                                    type="email"
+                                    placeholder="example@gmail.com"
+                                    className="w-full rounded bg-white border border-[#999999] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#999999] outline-none transition-all duration-200 focus:border-[#5b7fc4] focus:border-2"
                                 />
-                                {
-                                    form.formState.errors.email && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                            {form.formState.errors.email.message}
-                                        </p>
-                                    )
-                                }
+                                {form.formState.errors.email && (
+                                    <p className="mt-1 text-xs text-[#d32f2f]">
+                                        {form.formState.errors.email.message}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
-                                <label className="space-y-4 text-sm text-gray-700 font-medium">
+                                <label className="block text-xs font-semibold text-[#1d1d1d] mb-1">
                                     Password
                                 </label>
-                                <input 
-                                {...form.register("password")}
-                                type="password"
-                                placeholder="********"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none"
+                                <input
+                                    {...form.register("password")}
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className="w-full rounded bg-white border border-[#999999] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#999999] outline-none transition-all duration-200 focus:border-[#5b7fc4] focus:border-2"
                                 />
-                                {
-                                    form.formState.errors.password && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                            {form.formState.errors.password.message}
-                                        </p>
-                                    )
-                                }
+                                {form.formState.errors.password && (
+                                    <p className="mt-1 text-xs text-[#d32f2f]">
+                                        {form.formState.errors.password.message}
+                                    </p>
+                                )}
                             </div>
 
                             <div>
-                                <label className="space-y-4 text-sm text-gray-700 font-medium">
+                                <label className="block text-xs font-semibold text-[#1d1d1d] mb-1">
                                     Confirm Password
                                 </label>
-                                <input 
-                                {...form.register("confirmPassword")}
-                                type="password"
-                                placeholder="********"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 shadow-sm focus:border-gray-500 focus:outline-none"
+                                <input
+                                    {...form.register("confirmPassword")}
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className="w-full rounded bg-white border border-[#999999] px-3 py-2 text-sm text-[#1d1d1d] placeholder-[#999999] outline-none transition-all duration-200 focus:border-[#5b7fc4] focus:border-2"
                                 />
-                                {
-                                    form.formState.errors.confirmPassword && (
-                                        <p className="mt-1 text-sm text-red-500">
-                                            {form.formState.errors.confirmPassword.message}
-                                        </p>
-                                    )
-                                } 
+                                {form.formState.errors.confirmPassword && (
+                                    <p className="mt-1 text-xs text-[#d32f2f]">
+                                        {form.formState.errors.confirmPassword.message}
+                                    </p>
+                                )}
                             </div>
                         </div>
-                        <button type="submit"
-                        disabled={loading}
-                        className="flex w-full items-center justify-center rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50">
-                        
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full rounded-md bg-[#5b7fc4] px-6 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#4a6ba3] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
                             {loading ? "Creating account..." : "Create account"}
-                        
                         </button>
-                        <p className="text-center text-sm text-gray-600">
-                            Already have an account?{" "} 
-                            <Link href="/login"
-                            className="font-medium text-blue-500 hover:text-blue-600">
+
+                        <p className="text-center text-sm text-[#666666]">
+                            Already have an account?{" "}
+                            <Link
+                                href="/login"
+                                className="font-medium text-[#5b7fc4] hover:underline"
+                            >
                                 Sign in
                             </Link>
                         </p>
                     </form>
                 </div>
-            </main>
+            </div>
         </div>
-    )
+    );
 }

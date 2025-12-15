@@ -4,18 +4,18 @@ import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { FiLogOut } from "react-icons/fi"
 
-export default function SignOutButton (){
+export default function SignOutButton() {
     const router = useRouter()
 
     const handleSignOut = async () => {
         await signOut({
-            redirect : false
+            redirect: false
         })
         router.push("/login")
     }
 
-    return <button onClick={handleSignOut} className="flex h-8 items-center gap-2 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+    return <button onClick={handleSignOut} aria-label="Sign out" className="flex h-9 items-center gap-2 rounded bg-white px-4 text-sm font-medium text-[#003d7a] transition-colors hover:bg-[#f0f0f0]">
         <FiLogOut className="h-4 w-4" />
-        Logout
+        <span className="hidden sm:inline">Logout</span>
     </button>
 }
