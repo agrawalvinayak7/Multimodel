@@ -7,7 +7,8 @@ import SignOutButton from "~/components/client/Signout";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import LoginPage from "~/app/login/page";
-import { Logo } from "~/components/ui/logo";
+import Image from "next/image";
+
 
 export default async function HomePage() {
   const session = await auth();
@@ -25,7 +26,7 @@ export default async function HomePage() {
       <nav className="sticky top-0 z-50 bg-[#003d7a] border-b border-[#0055b3]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <Logo className="h-8 w-8" />
+            <Image src="/favicon.png" alt="Logo" width={32} height={32} className="h-8 w-8" />
             <span className="text-xl font-semibold text-white">Sentiment Analysis</span>
           </div>
 
