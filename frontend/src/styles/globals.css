@@ -1,12 +1,11 @@
 @import "tailwindcss";
 
-@theme {
+:root {
+  /* Font Families */
   --font-sans: Arial, Helvetica, ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-heading: Arial, Helvetica, var(--font-sans);
-}
 
-:root {
   /* Main Colors */
   --card-bg: #d4d5cf;
   --dashboard-bg: #004d9c;
